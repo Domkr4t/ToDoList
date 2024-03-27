@@ -1,0 +1,53 @@
+﻿@using ToDoList.Backend.Domain.Enum;
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<h4 class="mb-3 text-muted">Создание задачи</h4>
+<form id="createTaskForm">
+    <div class="mb-3 ">
+        <label class="form-label">Название задачи</label>
+        <input name="name" type="text" class="form-control"/>
+    </div>
+
+    <div class="mb-3 ">
+        <label class="form-label">Приоритетность задачи</label>
+        <select name="priority" class="form-select mb-3" asp-items="Html.GetEnumSelectList<Priority>()"></select>
+    </div>
+    
+    <div class="mb-3 ">
+        <label class="form-label">Описание задачи</label>
+        <textarea name="description" type="text" class="form-control"></textarea>
+    </div>
+
+</form>
+<button id="createTask" class="btn btn-primary">Создать задачу</button>
+
+@section Scripts
+{
+    <script>
+        $('#createTask').on('click', function (){
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("CreateTask", "Task")',
+                data: $('#createTaskForm').serialize(),
+                success: function (response) {
+                    Swal.fire({
+                        title: 'Все получилось',
+                        text: response.description,
+                        icon: 'success',
+                        confirmButtonText: 'Окей'
+                    })
+                },
+                error: function (response) {
+                    Swal.fire({
+                        title: 'Упс',
+                        text: response.responseJSON.description,
+                        icon: 'error',
+                        confirmButtonText: 'Окей'
+                    })
+                },
+            })
+        });
+    </script>
+}
