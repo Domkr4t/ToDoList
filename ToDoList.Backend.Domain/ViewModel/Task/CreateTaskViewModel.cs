@@ -1,5 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
+﻿using System.ComponentModel.DataAnnotations;
 using ToDoList.Backend.Domain.Enum;
 
 namespace ToDoList.Backend.Domain.ViewModel.Task

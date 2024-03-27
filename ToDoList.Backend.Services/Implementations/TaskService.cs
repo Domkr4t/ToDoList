@@ -1,10 +1,10 @@
 ﻿using Microsoft.EntityFrameworkCore;
-using Microsoft.EntityFrameworkCore.Metadata.Internal;
 using Microsoft.Extensions.Logging;
 using ToDoList.Backend.DAL.Interfaces;
 using ToDoList.Backend.Domain.Entity;
 using ToDoList.Backend.Domain.Enum;
 using ToDoList.Backend.Domain.Response;
+using ToDoList.Backend.Domain.Extentions;
 using ToDoList.Backend.Domain.ViewModel.Task;
 using ToDoList.Backend.Services.Interfaces;
 
@@ -64,6 +64,37 @@ namespace ToDoList.Backend.Services.Implementations
                 _logger.LogError(ex, $"[TaskService:CreateTask] : {ex.Message}");
 
                 return new BaseResponse<CreateTaskViewModel>
+                {
+                    Description = ex.Message,
+                    StatusCode = StatusCode.InternalServerError
+                };
+            }
+        }
+
+        public async Task<IBaseResponse<IEnumerable<TaskViewModel>>> GetAllTasks()
+        {
+            try
+            {
+                var tasks = await _taskRepository.GetAll().Select(x => new TaskViewModel
+                {
+                    Name = x.Name,
+                    Description = x.Description,
+                    Priority = x.Priority.GetDisplayName(),
+                    CreatedAt = x.CreatedAt.Date.ToLongDateString(),
+                    IsDone = x.IsDone == true ? "Выполнена" : "Не выполнена"
+                }).ToListAsync();
+
+                return new BaseResponse<IEnumerable<TaskViewModel>>
+                {
+                    Data = tasks,
+                    StatusCode = StatusCode.Ok
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[TaskService:GetAllTasks] : {ex.Message}");
+
+                return new BaseResponse<IEnumerable<TaskViewModel>>
                 {
                     Description = ex.Message,
                     StatusCode = StatusCode.InternalServerError

@@ -1,4 +1,5 @@
 ﻿using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 using ToDoList.Backend.Domain.Enum;
 
 namespace ToDoList.Backend.Domain.Entity
@@ -9,10 +10,11 @@ namespace ToDoList.Backend.Domain.Entity
         public long Id { get; set; }
 
         [Comment("Task name")]
+        [StringLength(50)]
         public string Name { get; set; }
 
         [Comment("Task description")]
-        public string Description { get; set; }
+        public string? Description { get; set; }
 
         [Comment("Task priority")]
         public Priority Priority { get; set; }
