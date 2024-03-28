@@ -12,10 +12,10 @@
         <label class="col-form-label">Приоритетность</label>
         <select name="taskPriority" class="form-control mb-3" asp-items="Html.GetEnumSelectList<Priority>()"></select>
     </div>
-@*     <div class="form-group col-md-6">
-        <label class="col-form-label">Статус</label>
-        <input name="taskIdDone" type="text" class="form-control" />
-    </div> *@
+    <div class="form-group col-md-6">
+        <label class="col-form-label">Выполнен ли</label> 
+        <input name="taskIsDone" type="checkbox" />
+    </div>
 </div>
 
 <br />
@@ -80,16 +80,17 @@
         function model() {
             return {
                 Name: $('input[name="taskName"]').val(),
-                Priority: $('select[name="taskPriority"]').val()
+                Priority: $('select[name="taskPriority"]').val(),
+                IsDone: $('input[name="taskIsDone"]').is(":checked"),
             }
         }
 
-        $('input[name="taskName"]').on('change', function () {
+        $('input[name="taskName"], select[name="taskPriority"]').on('change', function () {
             dataTable.draw();
-        })
+        });
 
-        $('select[name="taskPriority"]').on('change', function () {
+        $('input[type="checkbox"][name="taskIsDone"]').on('change', function () {
             dataTable.draw();
-        })
+        });
     </script>
 }
