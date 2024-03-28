@@ -1,4 +1,5 @@
-﻿using ToDoList.Backend.Domain.Response;
+﻿using ToDoList.Backend.Domain.Filters.Task;
+using ToDoList.Backend.Domain.Response;
 using ToDoList.Backend.Domain.ViewModel.Task;
 
 namespace ToDoList.Backend.Services.Interfaces
@@ -9,6 +10,6 @@ namespace ToDoList.Backend.Services.Interfaces
 
         Task<IBaseResponse<IEnumerable<TaskViewModel>>> GetAllTasksToday();
 
-        Task<IBaseResponse<IEnumerable<TaskViewModel>>> GetAllTasks();
+        Task<IBaseResponse<IEnumerable<TaskViewModel>>> GetAllTasks(TaskFilter filter);
     }
 }

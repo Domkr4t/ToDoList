@@ -1,6 +1,24 @@
-﻿@{
+﻿@using ToDoList.Backend.Domain.Enum;
+@{
     ViewData["Title"] = "All tasks";
 }
+
+<div class="row">
+    <div class="form-group col-md-6">
+        <label class="col-form-label">Название</label>
+        <input name="taskName" type="text" class="form-control" />
+    </div>
+    <div class="form-group col-md-6">
+        <label class="col-form-label">Приоритетность</label>
+        <select name="taskPriority" class="form-control mb-3" asp-items="Html.GetEnumSelectList<Priority>()"></select>
+    </div>
+@*     <div class="form-group col-md-6">
+        <label class="col-form-label">Статус</label>
+        <input name="taskIdDone" type="text" class="form-control" />
+    </div> *@
+</div>
+
+<br />
 
 <table class="table table-dark table-hover" id="taskTableId">
     <thead>
@@ -30,7 +48,9 @@
             ajax: {
                 url: '@Url.Action("GetAllTasks")',
                 method: 'POST',
-                data: null
+                data: function (d) {
+                    return $.extend({}, d, model());
+                }
             },
             columns: [
                 { data: 'name' },
@@ -42,7 +62,7 @@
                     data: null,
                     sortable: false,
                     render: function (data, type) {
-                        return '<button class="btn btn-success btn-sm center-block">Удалить</button>'
+                        return '<button class="btn btn-warning btn-sm center-block">Удалить</button>'
                     }
                 }
             ],
@@ -56,5 +76,20 @@
                 $('td button', nrow).eq(i).on('click', null);
             }
         });
+
+        function model() {
+            return {
+                Name: $('input[name="taskName"]').val(),
+                Priority: $('select[name="taskPriority"]').val()
+            }
+        }
+
+        $('input[name="taskName"]').on('change', function () {
+            dataTable.draw();
+        })
+
+        $('select[name="taskPriority"]').on('change', function () {
+            dataTable.draw();
+        })
     </script>
 }

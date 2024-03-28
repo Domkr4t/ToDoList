@@ -7,6 +7,7 @@ using ToDoList.Backend.Domain.Response;
 using ToDoList.Backend.Domain.Extentions;
 using ToDoList.Backend.Domain.ViewModel.Task;
 using ToDoList.Backend.Services.Interfaces;
+using ToDoList.Backend.Domain.Filters.Task;
 
 namespace ToDoList.Backend.Services.Implementations
 {
@@ -78,13 +79,13 @@ namespace ToDoList.Backend.Services.Implementations
                 var tasks = await _taskRepository.GetAll()
                     .Where(x => x.CreatedAt.Date == DateTime.Today)
                     .Select(x => new TaskViewModel
-                {
-                    Name = x.Name,
-                    Description = x.Description,
-                    Priority = x.Priority.GetDisplayName(),
-                    CreatedAt = x.CreatedAt.Date.ToLongDateString(),
-                    IsDone = x.IsDone == true ? "Выполнена" : "Не выполнена"
-                }).ToListAsync();
+                    {
+                        Name = x.Name,
+                        Description = x.Description,
+                        Priority = x.Priority.GetDisplayName(),
+                        CreatedAt = x.CreatedAt.Date.ToLongDateString(),
+                        IsDone = x.IsDone == true ? "Выполнена" : "Не выполнена"
+                    }).ToListAsync();
 
                 return new BaseResponse<IEnumerable<TaskViewModel>>
                 {
@@ -104,11 +105,14 @@ namespace ToDoList.Backend.Services.Implementations
             }
         }
 
-        public async Task<IBaseResponse<IEnumerable<TaskViewModel>>> GetAllTasks()
+        public async Task<IBaseResponse<IEnumerable<TaskViewModel>>> GetAllTasks(TaskFilter filter)
         {
             try
             {
                 var tasks = await _taskRepository.GetAll()
+                    .WhereIf(filter.Priority.HasValue, x => x.Priority == filter.Priority)
+                    .WhereIf(!string.IsNullOrWhiteSpace(filter.Name), x => x.Name == filter.Name)
+                    .WhereIf(filter.IsDone.HasValue, x => x.IsDone == filter.IsDone)
                     .Select(x => new TaskViewModel
                     {
                         Name = x.Name,

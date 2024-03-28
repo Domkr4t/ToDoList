@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using ToDoList.Backend.Domain.Filters.Task;
 using ToDoList.Backend.Domain.ViewModel.Task;
 using ToDoList.Backend.Services.Interfaces;
 
@@ -45,9 +46,9 @@ namespace ToDoList.Controllers
 
         [Route("/AllTasks")]
         [HttpPost]
-        public async Task<IActionResult> GetAllTasks()
+        public async Task<IActionResult> GetAllTasks(TaskFilter filter)
         {
-            var response = await _taskService.GetAllTasks();
+            var response = await _taskService.GetAllTasks(filter);
 
             return Json(new { data = response.Data });
         }
