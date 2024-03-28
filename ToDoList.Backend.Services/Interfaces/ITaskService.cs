@@ -7,6 +7,8 @@ namespace ToDoList.Backend.Services.Interfaces
     {
         Task<IBaseResponse<CreateTaskViewModel>> CreateTask (CreateTaskViewModel model);
 
-        Task<IBaseResponse<IEnumerable<TaskViewModel>>> GetAllTasks ();
+        Task<IBaseResponse<IEnumerable<TaskViewModel>>> GetAllTasksToday();
+
+        Task<IBaseResponse<IEnumerable<TaskViewModel>>> GetAllTasks();
     }
 }

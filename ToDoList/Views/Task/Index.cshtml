@@ -3,6 +3,7 @@
     ViewData["Title"] = "Home Page";
 }
 
+
 <h4 class="mb-3 text-muted">Создание задачи</h4>
 <form id="createTaskForm">
     <div class="mb-3 ">
@@ -78,33 +79,33 @@
             paging: false,
             sorting: false,
             ajax: {
-                url: '@Url.Action("GetAllTasks")',
+                url: '@Url.Action("GetAllTasksToday")',
                 method: 'POST',
                 data: null
             },
-            // columns: [
-            //     { data: 'name' },
-            //     { data: 'priority' },
-            //     { data: 'description' },
-            //     { data: 'createdat' },
-            //     { data: 'isdone' },
-            //     {
-            //         data: null,
-            //         sortable: false,
-            //         render: function (data, type) {
-            //             return '<button class="btn btn-success btn-sm center-block">выполнить</button>'
-            //         }
-            //     }
-            // ],
-            // createdrow: function (nrow, data) {
-            //     for (var i = 0, i <datatable.columns().header().length - 1, i++) {
-            //         $('td', nrow).eq(i).css('cursor', 'pointer');
+            columns: [
+                { data: 'name' },
+                { data: 'priority' },
+                { data: 'description' },
+                { data: 'createdAt' },
+                { data: 'isDone' },
+                {
+                    data: null,
+                    sortable: false,
+                    render: function (data, type) {
+                        return '<button class="btn btn-success btn-sm center-block">Выполнить</button>'
+                    }
+                }
+            ],
+            createdrow: function (nrow, data) {
+                for (var i = 0; i < datatable.columns().header().length - 1; i++) {
+                    $('td', nrow).eq(i).css('cursor', 'pointer');
 
-            //         $('td', nrow).eq(i).on('click', null);
-            //     }
+                    $('td', nrow).eq(i).on('click', null);
+                }
 
-            //     $('td button', nrow).eq(i).on('click', null);
-            // }
+                $('td button', nrow).eq(i).on('click', null);
+            }
         });
     </script>
 }

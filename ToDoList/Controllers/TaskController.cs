@@ -18,6 +18,11 @@ namespace ToDoList.Controllers
             return View();
         }
 
+        public IActionResult AllTasks()
+        {
+            return View();
+        }
+
         [HttpPost]
         public async Task<IActionResult> CreateTask(CreateTaskViewModel model)
         {
@@ -30,6 +35,15 @@ namespace ToDoList.Controllers
             return BadRequest(new { description = response.Description });
         }
 
+        [HttpPost]
+        public async Task<IActionResult> GetAllTasksToday()
+        {
+            var response = await _taskService.GetAllTasksToday();
+
+            return Json(new { data = response.Data });
+        }
+
+        [Route("/AllTasks")]
         [HttpPost]
         public async Task<IActionResult> GetAllTasks()
         {

@@ -1,0 +1,60 @@
+﻿@{
+    ViewData["Title"] = "All tasks";
+}
+
+<table class="table table-dark table-hover" id="taskTableId">
+    <thead>
+        <tr>
+            <th>Название задачи</th>
+            <th>Приоритетность задачи</th>
+            <th>Описание задачи</th>
+            <th>Дата создания задачи</th>
+            <th>Выполнена ли задача</th>
+            <th>Действие</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+
+
+@section Scripts
+{
+    <script>
+        let dataTable = $('#taskTableId').DataTable({
+            info: false,
+            serverSide: true,
+            searching: false,
+            paging: false,
+            sorting: false,
+            ajax: {
+                url: '@Url.Action("GetAllTasks")',
+                method: 'POST',
+                data: null
+            },
+            columns: [
+                { data: 'name' },
+                { data: 'priority' },
+                { data: 'description' },
+                { data: 'createdAt' },
+                { data: 'isDone' },
+                {
+                    data: null,
+                    sortable: false,
+                    render: function (data, type) {
+                        return '<button class="btn btn-success btn-sm center-block">Удалить</button>'
+                    }
+                }
+            ],
+            createdrow: function (nrow, data) {
+                for (var i = 0; i < datatable.columns().header().length - 1; i++) {
+                    $('td', nrow).eq(i).css('cursor', 'pointer');
+
+                    $('td', nrow).eq(i).on('click', null);
+                }
+
+                $('td button', nrow).eq(i).on('click', null);
+            }
+        });
+    </script>
+}

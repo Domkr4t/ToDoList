@@ -71,11 +71,13 @@ namespace ToDoList.Backend.Services.Implementations
             }
         }
 
-        public async Task<IBaseResponse<IEnumerable<TaskViewModel>>> GetAllTasks()
+        public async Task<IBaseResponse<IEnumerable<TaskViewModel>>> GetAllTasksToday()
         {
             try
             {
-                var tasks = await _taskRepository.GetAll().Select(x => new TaskViewModel
+                var tasks = await _taskRepository.GetAll()
+                    .Where(x => x.CreatedAt.Date == DateTime.Today)
+                    .Select(x => new TaskViewModel
                 {
                     Name = x.Name,
                     Description = x.Description,
@@ -83,6 +85,38 @@ namespace ToDoList.Backend.Services.Implementations
                     CreatedAt = x.CreatedAt.Date.ToLongDateString(),
                     IsDone = x.IsDone == true ? "Выполнена" : "Не выполнена"
                 }).ToListAsync();
+
+                return new BaseResponse<IEnumerable<TaskViewModel>>
+                {
+                    Data = tasks,
+                    StatusCode = StatusCode.Ok
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[TaskService:GetAllTasks] : {ex.Message}");
+
+                return new BaseResponse<IEnumerable<TaskViewModel>>
+                {
+                    Description = ex.Message,
+                    StatusCode = StatusCode.InternalServerError
+                };
+            }
+        }
+
+        public async Task<IBaseResponse<IEnumerable<TaskViewModel>>> GetAllTasks()
+        {
+            try
+            {
+                var tasks = await _taskRepository.GetAll()
+                    .Select(x => new TaskViewModel
+                    {
+                        Name = x.Name,
+                        Description = x.Description,
+                        Priority = x.Priority.GetDisplayName(),
+                        CreatedAt = x.CreatedAt.Date.ToLongDateString(),
+                        IsDone = x.IsDone == true ? "Выполнена" : "Не выполнена"
+                    }).ToListAsync();
 
                 return new BaseResponse<IEnumerable<TaskViewModel>>
                 {
