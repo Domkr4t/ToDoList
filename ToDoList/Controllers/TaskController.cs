@@ -1,5 +1,6 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ToDoList.Backend.Domain.Filters.Task;
+using ToDoList.Backend.Domain.Response;
 using ToDoList.Backend.Domain.ViewModel.Task;
 using ToDoList.Backend.Services.Interfaces;
 
@@ -44,13 +45,36 @@ namespace ToDoList.Controllers
             return Json(new { data = response.Data });
         }
 
-        [Route("/AllTasks")]
         [HttpPost]
         public async Task<IActionResult> GetAllTasks(TaskFilter filter)
         {
             var response = await _taskService.GetAllTasks(filter);
 
             return Json(new { data = response.Data });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EndTask(long id)
+        {
+            var response = await _taskService.EndTask(id);
+
+            if (response.StatusCode == Backend.Domain.Enum.StatusCode.Ok)
+            {
+                return Ok(new { description = response.Description });
+            }
+            return BadRequest(new { description = response.Description });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> DeleteTask(long id)
+        {
+            var response = await _taskService.DeleteTask(id);
+
+            if (response.StatusCode == Backend.Domain.Enum.StatusCode.Ok)
+            {
+                return Ok(new { description = response.Description });
+            }
+            return BadRequest(new { description = response.Description });
         }
     }
 }

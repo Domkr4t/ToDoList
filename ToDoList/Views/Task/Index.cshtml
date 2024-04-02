@@ -25,19 +25,17 @@
 <button id="createTask" class="btn btn-primary">Создать задачу</button>
 <br />
 <br />
-<br />
 
-<br />
-
+<h4 class="mb-3 text-muted">Задачи на сегодня</h4>
 <table class="table table-dark table-hover" id="taskTableId">
     <thead>
         <tr>
             <th>Название задачи</th>
             <th>Приоритетность задачи</th>
             <th>Описание задачи</th>
-            <th>Дата создания задачи</th>
             <th>Выполнена ли задача</th>
             <th>Действие</th>
+            <th>Удалить</th>
         </tr>
     </thead>
     <tbody></tbody>
@@ -60,6 +58,7 @@
                         icon: 'success',
                         confirmButtonText: 'Окей'
                     })
+                    dataTable.draw();
                 },
                 error: function (response) {
                     Swal.fire({
@@ -71,9 +70,16 @@
                 },
             })
         });
-    </script>
 
-    <script>
+        const swalWithBootstrapButtons = Swal.mixin({
+            customClass: {
+                confirmButton: "btn btn-success",
+                cancelButton: "btn btn-danger"
+            },
+            buttonsStyling: false
+        });
+
+
         let dataTable = $('#taskTableId').DataTable({
             info: false,
             serverSide: true,
@@ -89,24 +95,107 @@
                 { data: 'name' },
                 { data: 'priority' },
                 { data: 'description' },
-                { data: 'createdAt' },
                 { data: 'isDone' },
                 {
                     data: null,
                     sortable: false,
                     render: function (data, type) {
-                        return '<button class="btn btn-success btn-sm center-block">Выполнить</button>'
+                        return '<button id="updateButton" class="btn btn-success btn-sm center-block">Выполнить</button>'
                     }
-                }
+                },
+                {
+                    data: null,
+                    sortable: false,
+                    render: function (data, type) {
+                        return '<button id="deleteButton" class="btn btn-danger btn-sm center-block">Удалить</button>'
+                    }
+                },
             ],
-            createdrow: function (nrow, data) {
-                for (var i = 0; i < datatable.columns().header().length - 1; i++) {
-                    $('td', nrow).eq(i).css('cursor', 'pointer');
+            createdRow: function (nrow, data) {
+                var taskComplete = function () {
 
+                    swalWithBootstrapButtons.fire({
+                        title: "Вы уверены?",
+                        text: "Подтвердите выполнение задачи.",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Да!",
+                        cancelButtonText: "Отмена!",
+                        reverseButtons: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                type: 'POST',
+                                url: '@Url.Action("EndTask")',
+                                data: { id: data.id },
+                                success: function (response) {
+                                    Swal.fire({
+                                        title: 'Все получилось',
+                                        text: response.description,
+                                        icon: 'success',
+                                        confirmButtonText: 'Окей'
+                                    })
+                                    dataTable.draw();
+                                },
+                                error: function (response) {
+                                    Swal.fire({
+                                        title: 'Упс',
+                                        text: response.responseJSON.description,
+                                        icon: 'error',
+                                        confirmButtonText: 'Окей'
+                                    })
+                                },
+                            })
+                        }
+                    });
+
+                }
+                var taskDelete = function () {
+
+                    swalWithBootstrapButtons.fire({
+                        title: "Вы уверены?",
+                        text: "Подтвердите удаление задачи.",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Да!",
+                        cancelButtonText: "Отмена!",
+                        reverseButtons: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                type: 'POST',
+                                url: '@Url.Action("DeleteTask")',
+                                data: { id: data.id },
+                                success: function (response) {
+                                    Swal.fire({
+                                        title: 'Все получилось',
+                                        text: response.description,
+                                        icon: 'success',
+                                        confirmButtonText: 'Окей'
+                                    })
+                                    dataTable.draw();
+                                },
+                                error: function (response) {
+                                    Swal.fire({
+                                        title: 'Упс',
+                                        text: response.responseJSON.description,
+                                        icon: 'error',
+                                        confirmButtonText: 'Окей'
+                                    })
+                                },
+                            })
+                        }
+                    });
+                }
+
+
+                for (var i = 0; i < dataTable.columns().header().length - 1; i++) {
+                    $('td', nrow).eq(i).css('cursor', 'pointer');
                     $('td', nrow).eq(i).on('click', null);
                 }
 
-                $('td button', nrow).eq(i).on('click', null);
+                $('#updateButton', nrow).on('click', taskComplete);
+                $('#deleteButton', nrow).on('click', taskDelete);
             }
         });
     </script>

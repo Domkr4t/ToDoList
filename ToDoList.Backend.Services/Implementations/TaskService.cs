@@ -8,6 +8,7 @@ using ToDoList.Backend.Domain.Extentions;
 using ToDoList.Backend.Domain.ViewModel.Task;
 using ToDoList.Backend.Services.Interfaces;
 using ToDoList.Backend.Domain.Filters.Task;
+using System.Security.Principal;
 
 namespace ToDoList.Backend.Services.Implementations
 {
@@ -78,8 +79,10 @@ namespace ToDoList.Backend.Services.Implementations
             {
                 var tasks = await _taskRepository.GetAll()
                     .Where(x => x.CreatedAt.Date == DateTime.Today)
+                    .Where(x => x.IsDone == false)
                     .Select(x => new TaskViewModel
                     {
+                        Id = x.Id,
                         Name = x.Name,
                         Description = x.Description,
                         Priority = x.Priority.GetDisplayName(),
@@ -115,6 +118,7 @@ namespace ToDoList.Backend.Services.Implementations
                     .WhereIf(filter.IsDone.HasValue, x => x.IsDone == filter.IsDone)
                     .Select(x => new TaskViewModel
                     {
+                        Id = x.Id,
                         Name = x.Name,
                         Description = x.Description,
                         Priority = x.Priority.GetDisplayName(),
@@ -133,6 +137,78 @@ namespace ToDoList.Backend.Services.Implementations
                 _logger.LogError(ex, $"[TaskService:GetAllTasks] : {ex.Message}");
 
                 return new BaseResponse<IEnumerable<TaskViewModel>>
+                {
+                    Description = ex.Message,
+                    StatusCode = StatusCode.InternalServerError
+                };
+            }
+        }
+
+        public async Task<IBaseResponse<bool>> EndTask(long id)
+        {
+            try
+            {
+                var task = await _taskRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id);
+
+                if (task == null)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        Description = "Такой задачи не существует",
+                        StatusCode = StatusCode.TaskIsNotFound
+                    };
+                }
+
+                task.IsDone = true;
+
+                await _taskRepository.Update(task);
+
+                return new BaseResponse<bool>
+                {
+                    Description = $"Задача {task.Name} выполнена",
+                    StatusCode = StatusCode.Ok
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[TaskService:EndTask] : {ex.Message}");
+
+                return new BaseResponse<bool>
+                {
+                    Description = ex.Message,
+                    StatusCode = StatusCode.InternalServerError
+                };
+            }
+        }
+
+        public async Task<IBaseResponse<bool>> DeleteTask(long id)
+        {
+            try
+            {
+                var task = await _taskRepository.GetAll().FirstOrDefaultAsync(x => x.Id == id);
+
+                if (task == null)
+                {
+                    return new BaseResponse<bool>
+                    {
+                        Description = "Такой задачи не существует",
+                        StatusCode = StatusCode.TaskIsNotFound
+                    };
+                }
+
+                await _taskRepository.Delete(task);
+
+                return new BaseResponse<bool>
+                {
+                    Description = $"Задача {task.Name} удалена",
+                    StatusCode = StatusCode.Ok
+                };
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"[TaskService:DeleteTask] : {ex.Message}");
+
+                return new BaseResponse<bool>
                 {
                     Description = ex.Message,
                     StatusCode = StatusCode.InternalServerError

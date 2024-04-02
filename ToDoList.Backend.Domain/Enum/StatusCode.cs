@@ -3,7 +3,7 @@
     public enum StatusCode
     {
         TaskIsHasAlready = 01,
-        TaskIsNotNotFound = 02,
+        TaskIsNotFound = 02,
 
         Ok = 200,
         InternalServerError = 500,

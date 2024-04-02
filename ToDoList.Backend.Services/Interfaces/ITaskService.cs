@@ -11,5 +11,9 @@ namespace ToDoList.Backend.Services.Interfaces
         Task<IBaseResponse<IEnumerable<TaskViewModel>>> GetAllTasksToday();
 
         Task<IBaseResponse<IEnumerable<TaskViewModel>>> GetAllTasks(TaskFilter filter);
+
+        Task<IBaseResponse<bool>> EndTask(long id);
+
+        Task<IBaseResponse<bool>> DeleteTask(long id);
     }
 }
