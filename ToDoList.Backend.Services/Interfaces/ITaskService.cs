@@ -15,5 +15,7 @@ namespace ToDoList.Backend.Services.Interfaces
         Task<IBaseResponse<bool>> EndTask(long id);
 
         Task<IBaseResponse<bool>> DeleteTask(long id);
+
+        Task<IBaseResponse<IEnumerable<TaskViewModel>>> GetExecutedTasks();
     }
 }

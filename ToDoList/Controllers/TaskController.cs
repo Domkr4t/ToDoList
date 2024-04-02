@@ -54,6 +54,14 @@ namespace ToDoList.Controllers
         }
 
         [HttpPost]
+        public async Task<IActionResult> GetExecutedTasks()
+        {
+            var response = await _taskService.GetExecutedTasks();
+
+            return Json(new { data = response.Data });
+        }
+
+        [HttpPost]
         public async Task<IActionResult> EndTask(long id)
         {
             var response = await _taskService.EndTask(id);

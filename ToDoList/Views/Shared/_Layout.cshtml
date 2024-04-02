@@ -38,8 +38,17 @@
                 <h4 class="d-flex justify-content-between align-items-center mb-3 ">
                     <span class="text-muted">Выполненные задачи</span>
                     <span class="badge badge-secondary badge-pill text-muted" id="countOfCompletedTasks"></span>
+                    
                 </h4>
-                <ul class="list-group mb-3" id="completedListTasks"></ul>
+                <table class="table table-white" id="executedTaskTableId">
+                    <thead>
+                        <tr>
+                            <th>Название задачи</th>
+                            <th>Удалить</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
             </div>
             <div class="col-md-8 order-md-1">
                 @RenderBody()
@@ -58,6 +67,82 @@
     <script src="~/js/site.js" asp-append-version="true"></script>
     <script type="text/javascript" src="https://cdn.datatables.net/2.0.3/js/dataTables.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        let completeDataTable = $('#executedTaskTableId').DataTable({
+            info: false,
+            serverSide: true,
+            searching: false,
+            paging: false,
+            sorting: false,
+            ajax: {
+                url: '@Url.Action("GetExecutedTasks")',
+                method: 'POST',
+                data: null
+            },
+            columns: [
+                { data: 'name' },
+                {
+                    data: null,
+                    sortable: false,
+                    render: function (data, type) {
+                        return '<button id="completeDeleteButton" class="btn btn-danger btn-sm center-block">Удалить</button>'
+                    }
+                },
+            ],
+            createdRow: function (nrow, data) {
+
+                var taskDelete = function () {
+
+                    swalWithBootstrapButtons.fire({
+                        title: "Вы уверены?",
+                        text: "Подтвердите удаление задачи.",
+                        icon: "warning",
+                        showCancelButton: true,
+                        confirmButtonText: "Да!",
+                        cancelButtonText: "Отмена!",
+                        reverseButtons: false
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            $.ajax({
+                                type: 'POST',
+                                url: '@Url.Action("DeleteTask")',
+                                data: { id: data.id },
+                                success: function (response) {
+                                    Swal.fire({
+                                        title: 'Все получилось',
+                                        text: response.description,
+                                        icon: 'success',
+                                        confirmButtonText: 'Окей'
+                                    })
+                                    dataTable.draw();
+                                    completeDataTable.draw();
+                                },
+                                error: function (response) {
+                                    Swal.fire({
+                                        title: 'Упс',
+                                        text: response.responseJSON.description,
+                                        icon: 'error',
+                                        confirmButtonText: 'Окей'
+                                    })
+                                },
+                            })
+                        }
+                    });
+                }
+
+                for (var i = 0; i < completeDataTable.columns().header().length - 1; i++) {
+                    $('td', nrow).eq(i).css('cursor', 'pointer');
+                    $('td', nrow).eq(i).on('click', null);
+                }
+
+                $('#completeDeleteButton', nrow).on('click', taskDelete);
+                $('td button', nrow).eq(i).on('click', null);
+            }
+        });
+
+       
+    </script>
+
     @await RenderSectionAsync("Scripts", required: false)
 </body>
 </html>
