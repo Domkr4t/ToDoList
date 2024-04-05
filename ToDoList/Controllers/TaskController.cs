@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using ToDoList.Backend.Domain.Filters.Task;
 using ToDoList.Backend.Domain.Response;
+using ToDoList.Backend.Domain.Utils;
 using ToDoList.Backend.Domain.ViewModel.Task;
 using ToDoList.Backend.Services.Interfaces;
 
@@ -81,6 +82,21 @@ namespace ToDoList.Controllers
             if (response.StatusCode == Backend.Domain.Enum.StatusCode.Ok)
             {
                 return Ok(new { description = response.Description });
+            }
+            return BadRequest(new { description = response.Description });
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> EndOfDayReport()
+        {
+            var response = await _taskService.EndOfDayReport();
+
+            if (response.StatusCode == Backend.Domain.Enum.StatusCode.Ok)
+            {
+                var csvService = new CsvBaseService<IEnumerable<TaskViewModel>>();
+                var downloadFile = csvService.DownloadFile(response.Data);
+
+                return File(downloadFile, "txt/csv", $"Отчет задач за день {DateTime.Now.ToLongDateString()}csv");
             }
             return BadRequest(new { description = response.Description });
         }

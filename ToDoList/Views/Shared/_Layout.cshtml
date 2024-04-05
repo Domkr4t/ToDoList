@@ -38,7 +38,6 @@
                 <h4 class="d-flex justify-content-between align-items-center mb-3 ">
                     <span class="text-muted">Выполненные задачи</span>
                     <span class="badge badge-secondary badge-pill text-muted" id="countOfCompletedTasks"></span>
-                    
                 </h4>
                 <table class="table table-white" id="executedTaskTableId">
                     <thead>
@@ -49,6 +48,11 @@
                     </thead>
                     <tbody></tbody>
                 </table>
+                <form asp-controller="Task" asp-action="EndOfDayReport" method="post" enctype="multipart/form-data">
+                    <div class="card col-md-12">
+                        <button type="submit" class="btn btn-secondary">Сформировать отчет</button>
+                    </div>
+                </form>
             </div>
             <div class="col-md-8 order-md-1">
                 @RenderBody()
@@ -139,8 +143,6 @@
                 $('td button', nrow).eq(i).on('click', null);
             }
         });
-
-       
     </script>
 
     @await RenderSectionAsync("Scripts", required: false)
