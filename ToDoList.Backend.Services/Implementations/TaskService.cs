@@ -9,6 +9,7 @@ using ToDoList.Backend.Domain.ViewModel.Task;
 using ToDoList.Backend.Services.Interfaces;
 using ToDoList.Backend.Domain.Filters.Task;
 using System.Security.Principal;
+using System.Threading.Tasks;
 
 namespace ToDoList.Backend.Services.Implementations
 {
@@ -108,7 +109,7 @@ namespace ToDoList.Backend.Services.Implementations
             }
         }
 
-        public async Task<IBaseResponse<IEnumerable<TaskViewModel>>> GetAllTasks(TaskFilter filter)
+        public async Task<DataTableResult> GetAllTasks(TaskFilter filter)
         {
             try
             {
@@ -124,22 +125,27 @@ namespace ToDoList.Backend.Services.Implementations
                         Priority = x.Priority.GetDisplayName(),
                         CreatedAt = x.CreatedAt.Date.ToLongDateString(),
                         IsDone = x.IsDone == true ? "Выполнена" : "Не выполнена"
-                    }).ToListAsync();
+                    })
+                    .Skip(filter.Skip)
+                    .Take(filter.PageSize)
+                    .ToListAsync();
 
-                return new BaseResponse<IEnumerable<TaskViewModel>>
+                var count = _taskRepository.GetAll().Count();
+
+                return new DataTableResult()
                 {
                     Data = tasks,
-                    StatusCode = StatusCode.Ok
+                    Total = count
                 };
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"[TaskService:GetAllTasks] : {ex.Message}");
 
-                return new BaseResponse<IEnumerable<TaskViewModel>>
+                return new DataTableResult()
                 {
-                    Description = ex.Message,
-                    StatusCode = StatusCode.InternalServerError
+                    Data = null,
+                    Total = 0
                 };
             }
         }

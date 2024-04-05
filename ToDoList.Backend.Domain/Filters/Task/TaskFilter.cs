@@ -3,7 +3,7 @@ using ToDoList.Backend.Domain.Enum;
 
 namespace ToDoList.Backend.Domain.Filters.Task
 {
-    public class TaskFilter
+    public class TaskFilter : PagingFilter
     {
         public string? Name { get; set; }
         public Priority? Priority { get; set; }
